@@ -21,7 +21,9 @@ data/
 *.parquet
 
 # Local model artifacts
-model_artifacts/
+# best_model/ IS committed: the Streamlit Cloud app loads it from the repo.
+model_artifacts/*
+!model_artifacts/best_model/
 input_example.json
 
 # Streamlit secrets
