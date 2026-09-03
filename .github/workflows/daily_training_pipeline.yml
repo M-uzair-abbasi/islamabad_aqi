@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
+    permissions:
+      contents: write
+
     env:
       HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
       HOPSWORKS_PROJECT_NAME: ${{ secrets.HOPSWORKS_PROJECT_NAME }}
@@ -37,3 +40,19 @@ jobs:
 
       - name: Run daily training pipeline
         run: python -m src.train_pipeline
+
+      - name: Commit updated model artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add model_artifacts/best_model
+
+          if git diff --cached --quiet; then
+            echo "No model changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update model artifacts from daily training run ($(date -u +'%Y-%m-%d'))"
+          git pull --rebase origin main
+          git push origin HEAD:main
